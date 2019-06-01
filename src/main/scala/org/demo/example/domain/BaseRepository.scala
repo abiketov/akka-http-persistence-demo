@@ -15,7 +15,6 @@ trait BaseRepository extends PersistentActor with ActorLogging {
       log.info(s"ReceiveTimeout message is received by ${self.path}")
       context.stop(self)
     case ActorShutdown => context.stop(self)
-    case "Test" => println("Actor is alive")
     case cmd @ _ => log.error(s"Unknown command $cmd")
   }
 
