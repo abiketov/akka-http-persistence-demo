@@ -7,7 +7,6 @@ import akka.persistence.journal.Tagged
 import akka.persistence.{ SaveSnapshotSuccess, SnapshotOffer }
 import org.demo.example.domain.DomainModel._
 
-
 object CustomerRepository {
   def props(id: String): Props = Props(new CustomerRepository(id))
 }
@@ -22,8 +21,6 @@ class CustomerRepository(customerId: String) extends BaseRepository {
   private var active = true
 
   override def persistenceId: String = customerId
-
-
 
   override def receiveCommandBehavior: Receive = {
     // Create or Update Customer
@@ -76,7 +73,6 @@ class CustomerRepository(customerId: String) extends BaseRepository {
     //Log successful snapshot update
     case SaveSnapshotSuccess(metadata) =>
       log.info(s"Snapshot updated successfully: $metadata")
-
 
   }
   override def receiveRecover: Receive = {

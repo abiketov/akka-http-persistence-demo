@@ -1,15 +1,15 @@
 package org.demo.example
 
-import akka.actor.{Actor, ActorLogging, ActorRef, ActorSelection, ActorSystem, Props}
-import akka.testkit.{ImplicitSender, TestKit}
+import akka.actor.{ Actor, ActorLogging, ActorRef, ActorSelection, ActorSystem, Props }
+import akka.testkit.{ ImplicitSender, TestKit }
 import org.demo.example.domain.CustomerRepository
 import org.demo.example.domain.DomainModel.CustomerCmd
-import org.scalatest.{BeforeAndAfterAll, WordSpecLike}
+import org.scalatest.{ BeforeAndAfterAll, WordSpecLike }
 
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.{ Future, Promise }
 import scala.concurrent.duration._
-import scala.util.{Failure, Success}
-import akka.pattern.{ask, pipe}
+import scala.util.{ Failure, Success }
+import akka.pattern.{ ask, pipe }
 import akka.util.Timeout
 
 class ActorLifeCycleSpec extends TestKit(ActorSystem("ActorLifeCycleSpec"))
@@ -21,15 +21,14 @@ class ActorLifeCycleSpec extends TestKit(ActorSystem("ActorLifeCycleSpec"))
 
     "return correct single actor ref" in {
 
-
-      val map = scala.collection.mutable.Map.empty[String,Int]
+      val map = scala.collection.mutable.Map.empty[String, Int]
       map += ("1" -> 1)
       map += ("2" -> 2)
 
       map -= "1"
 
-      system.actorOf(Props[ChildActor],"child")
-      val lookupActor = system.actorOf(Props[ActorLookup],"lookup")
+      system.actorOf(Props[ChildActor], "child")
+      val lookupActor = system.actorOf(Props[ActorLookup], "lookup")
       val parent = system.actorOf(Props(new ParentActor(lookupActor)))
 
       parent ! "CallChild"
@@ -38,18 +37,17 @@ class ActorLifeCycleSpec extends TestKit(ActorSystem("ActorLifeCycleSpec"))
     }
   }
 
-  def toActor(ref:ActorRef, msg:String):Unit = {
+  def toActor(ref: ActorRef, msg: String): Unit = {
     println("Before calling actor")
     ref ! msg
   }
-
 
 }
 
 object ActorLifeCycleSpec {
 
   case class ActorLookupCmd(actorName: String)
-  case class GetChild(ref:ActorRef)
+  case class GetChild(ref: ActorRef)
   case object DoWork
 
   class ChildActor() extends Actor {
@@ -61,22 +59,19 @@ object ActorLifeCycleSpec {
 
   class ParentActor(lookupActor: ActorRef) extends Actor with ActorLogging {
 
-
     override def receive: Receive = {
 
       case "CallChild" => lookupActor ! ActorLookupCmd("child")
-      case  GetChild(ref) =>
+      case GetChild(ref) =>
         log.info(s"I'm worker ${ref.path}")
         ref ! DoWork
     }
 
   }
 
-
   class ActorLookup extends Actor with ActorLogging {
 
     implicit val dispatcher = context.system.dispatcher
-
 
     def receive = {
 
@@ -85,14 +80,14 @@ object ActorLifeCycleSpec {
         val actorSelection: ActorSelection = context.actorSelection(s"/user/$name")
         val senderRef = sender
         val actorRefFuture: Future[ActorRef] = actorSelection.resolveOne(300 milliseconds)
-        actorRefFuture.onComplete{
+        actorRefFuture.onComplete {
           case Success(actorRef) =>
             log.info("Process future success")
             log.info(s"Lookup actor path ${actorRef.path}")
             senderRef ! GetChild(actorRef)
           case Failure(_) =>
             log.info("Process future failure")
-            val ref = context.system.actorOf(Props[ChildActor],name)
+            val ref = context.system.actorOf(Props[ChildActor], name)
             log.info(s"Found new actor ${ref.path}")
             senderRef ! GetChild(ref)
         }

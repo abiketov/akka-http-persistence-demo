@@ -1,19 +1,19 @@
 package org.demo.example.service
 
 import akka.NotUsed
-import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, Props, Terminated}
-import akka.pattern.{ask, pipe}
+import akka.actor.{ Actor, ActorLogging, ActorRef, ActorSystem, Props, Terminated }
+import akka.pattern.{ ask, pipe }
 import akka.persistence.query.journal.leveldb.scaladsl.LeveldbReadJournal
-import akka.persistence.query.{EventEnvelope, PersistenceQuery, Sequence}
+import akka.persistence.query.{ EventEnvelope, PersistenceQuery, Sequence }
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.scaladsl.{ Sink, Source }
 import akka.util.Timeout
-import org.demo.example.domain.DomainModel.{BaseCommandWithId, _}
-import org.demo.example.domain.{CustomerRepository, WalletRepository}
+import org.demo.example.domain.DomainModel.{ BaseCommandWithId, _ }
+import org.demo.example.domain.{ CustomerRepository, WalletRepository }
 
 import scala.collection.immutable
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 trait SystemService extends Actor with ActorLogging {
 
@@ -31,10 +31,10 @@ trait SystemService extends Actor with ActorLogging {
     events.runWith(Sink.seq)
   }
 
-  def repoActors: scala.collection.mutable.Map[String,ActorRef]
+  def repoActors: scala.collection.mutable.Map[String, ActorRef]
 
   def getRepositoryActor(name: String): ActorRef = {
-    repoActors.get(self.path.toString+s"/${name}") match {
+    repoActors.get(self.path.toString + s"/${name}") match {
       case None =>
         val ref = context.actorOf(repositoryBuilder(name), name)
         repoActors += (ref.path.toString -> ref)
@@ -46,11 +46,11 @@ trait SystemService extends Actor with ActorLogging {
 
   def repositoryBuilder(name: String): Props
 
-  override def receive:Receive =  receiveTerminated orElse businessReceive
+  override def receive: Receive = receiveTerminated orElse businessReceive
 
-  def businessReceive:Receive
+  def businessReceive: Receive
 
-  def receiveTerminated:Receive = {
+  def receiveTerminated: Receive = {
 
     case Terminated(ref) =>
       repoActors -= ref.path.toString
@@ -61,9 +61,9 @@ trait SystemService extends Actor with ActorLogging {
 
 class CustomerServiceActor() extends SystemService {
 
-  override val repoActors = scala.collection.mutable.Map.empty[String,ActorRef]
+  override val repoActors = scala.collection.mutable.Map.empty[String, ActorRef]
 
-  override def repositoryBuilder(name: String):Props = CustomerRepository.props(name)
+  override def repositoryBuilder(name: String): Props = CustomerRepository.props(name)
 
   override def businessReceive: Receive = {
 
@@ -100,9 +100,9 @@ object WalletServiceActor {
 }
 
 class WalletServiceActor(customerService: ActorRef) extends Actor with SystemService with ActorLogging {
-  override val repoActors = scala.collection.mutable.Map.empty[String,ActorRef]
+  override val repoActors = scala.collection.mutable.Map.empty[String, ActorRef]
 
-  override def repositoryBuilder(name: String):Props = WalletRepository.props(name)
+  override def repositoryBuilder(name: String): Props = WalletRepository.props(name)
 
   override def businessReceive: Receive = {
 

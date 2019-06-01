@@ -19,14 +19,12 @@ class WalletRepositorySpec extends TestKit(ActorSystem("WalletSpec"))
     path.deleteRecursively()
   }
 
-  
   "WalletRepository" should {
-
 
     "create new wallet" in {
       val walletId = "wallet_0001"
       val walletCmd = WalletCmd(Some(walletId), "cust1", "Wallet1", 0.0, TransactionType.DEPOSIT, "my first wallet")
-      val walletRepo = system.actorOf(WalletRepository.props(walletId),  walletId)
+      val walletRepo = system.actorOf(WalletRepository.props(walletId), walletId)
       walletRepo ! walletCmd
 
       val walletRes = expectMsgType[Either[String, Wallet]]
@@ -46,7 +44,7 @@ class WalletRepositorySpec extends TestKit(ActorSystem("WalletSpec"))
     "update wallet name and balance" in {
       val walletId = "wallet_0001"
       val walletCmd = WalletCmd(Some(walletId), "cust1", "Wallet1_Updated", 10.0, TransactionType.DEPOSIT, "my first wallet")
-      val walletRepo = system.actorOf(WalletRepository.props(walletId),  walletId)
+      val walletRepo = system.actorOf(WalletRepository.props(walletId), walletId)
       walletRepo ! walletCmd
 
       val walletRes = expectMsgType[Either[String, Wallet]]
@@ -66,7 +64,7 @@ class WalletRepositorySpec extends TestKit(ActorSystem("WalletSpec"))
     "update wallet balance deposit 100, expected 110" in {
       val walletId = "wallet_0001"
       val walletCmd = WalletBalanceUpdateCmd(walletId, 100.0, TransactionType.DEPOSIT)
-      val walletRepo = system.actorOf(WalletRepository.props(walletId),  walletId)
+      val walletRepo = system.actorOf(WalletRepository.props(walletId), walletId)
       walletRepo ! walletCmd
 
       val walletRes = expectMsgType[Either[String, Wallet]]
@@ -83,7 +81,7 @@ class WalletRepositorySpec extends TestKit(ActorSystem("WalletSpec"))
     "update wallet balance withdraw 50, expected 60" in {
       val walletId = "wallet_0001"
       val walletCmd = WalletBalanceUpdateCmd(walletId, 50.0, TransactionType.WITHDRAW)
-      val walletRepo = system.actorOf(WalletRepository.props(walletId),  walletId)
+      val walletRepo = system.actorOf(WalletRepository.props(walletId), walletId)
       walletRepo ! walletCmd
 
       val walletRes = expectMsgType[Either[String, Wallet]]
@@ -99,7 +97,7 @@ class WalletRepositorySpec extends TestKit(ActorSystem("WalletSpec"))
     "update wallet balance withdraw 150, expected withdraw failed" in {
       val walletId = "wallet_0001"
       val walletCmd = WalletBalanceUpdateCmd(walletId, 150.0, TransactionType.WITHDRAW)
-      val walletRepo = system.actorOf(WalletRepository.props(walletId),  walletId)
+      val walletRepo = system.actorOf(WalletRepository.props(walletId), walletId)
       walletRepo ! walletCmd
 
       val walletRes = expectMsgType[Either[String, Wallet]]
@@ -115,7 +113,7 @@ class WalletRepositorySpec extends TestKit(ActorSystem("WalletSpec"))
 
       // This wallet has balance 60
       val walletId = "wallet_0008"
-      var walletRepoFrom = system.actorOf(WalletRepository.props(walletId),  walletId)
+      var walletRepoFrom = system.actorOf(WalletRepository.props(walletId), walletId)
       val walletCmdFrom = WalletCmd(Some(walletId), "cust2", "Wallet1", 100.0, TransactionType.DEPOSIT, "transfer from wallet")
       walletRepoFrom ! walletCmdFrom
       val walletRes = expectMsgType[Either[String, Wallet]]
@@ -132,8 +130,8 @@ class WalletRepositorySpec extends TestKit(ActorSystem("WalletSpec"))
 
       Thread.sleep(400) // delay to update snapshots
 
-      walletRepoFrom = system.actorOf(WalletRepository.props(walletId),  walletId)
-      walletRepoTo = system.actorOf(WalletRepository.props(walletIdTo),  walletIdTo)
+      walletRepoFrom = system.actorOf(WalletRepository.props(walletId), walletId)
+      walletRepoTo = system.actorOf(WalletRepository.props(walletIdTo), walletIdTo)
 
       walletRepoFrom ! WalletGetCmd(walletId)
       val walletFrom = expectMsgType[Either[String, Wallet]]
@@ -152,7 +150,7 @@ class WalletRepositorySpec extends TestKit(ActorSystem("WalletSpec"))
 
       // This wallet has balance 60
       val walletId = "wallet_00018"
-      var walletRepoFrom = system.actorOf(WalletRepository.props(walletId),  walletId)
+      var walletRepoFrom = system.actorOf(WalletRepository.props(walletId), walletId)
       val walletCmdFrom = WalletCmd(Some(walletId), "cust2", "Wallet1", 10.0, TransactionType.DEPOSIT, "transfer from wallet")
       walletRepoFrom ! walletCmdFrom
       val walletRes = expectMsgType[Either[String, Wallet]]
@@ -160,7 +158,7 @@ class WalletRepositorySpec extends TestKit(ActorSystem("WalletSpec"))
       // Create new wallet with balance 0.0
       val walletIdTo = "wallet_00019"
       val walletCmdTo = WalletCmd(Some(walletIdTo), "cust3", "Wallet2", 0.0, TransactionType.DEPOSIT, "transfer to wallet")
-      var walletRepoTo = system.actorOf(WalletRepository.props(walletIdTo),  walletIdTo)
+      var walletRepoTo = system.actorOf(WalletRepository.props(walletIdTo), walletIdTo)
       walletRepoTo ! walletCmdTo
       val walletRes2 = expectMsgType[Either[String, Wallet]]
 
@@ -171,8 +169,8 @@ class WalletRepositorySpec extends TestKit(ActorSystem("WalletSpec"))
       assert(result.msg === WalletNotifications.TRANSFER_FAILED)
       Thread.sleep(150)
 
-      walletRepoFrom = system.actorOf(WalletRepository.props(walletId),  walletId)
-      walletRepoTo = system.actorOf(WalletRepository.props(walletIdTo),  walletIdTo)
+      walletRepoFrom = system.actorOf(WalletRepository.props(walletId), walletId)
+      walletRepoTo = system.actorOf(WalletRepository.props(walletIdTo), walletIdTo)
 
       walletRepoFrom ! WalletGetCmd(walletId)
       val walletFrom = expectMsgType[Either[String, Wallet]]

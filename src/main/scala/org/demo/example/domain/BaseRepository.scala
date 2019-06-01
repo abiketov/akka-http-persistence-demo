@@ -1,6 +1,6 @@
 package org.demo.example.domain
 
-import akka.actor.{ActorLogging, ReceiveTimeout}
+import akka.actor.{ ActorLogging, ReceiveTimeout }
 import akka.persistence.PersistentActor
 import org.demo.example.domain.DomainModel.ActorShutdown
 
@@ -10,7 +10,7 @@ trait BaseRepository extends PersistentActor with ActorLogging {
   val actorTimeout = context.system.settings.config.getInt("actor.timeout")
   context.setReceiveTimeout(actorTimeout millisecond)
 
-  def timeoutReceive:Receive = {
+  def timeoutReceive: Receive = {
     case ReceiveTimeout =>
       log.info(s"ReceiveTimeout message is received by ${self.path}")
       context.stop(self)

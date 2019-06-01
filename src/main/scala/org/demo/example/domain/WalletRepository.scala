@@ -2,7 +2,6 @@ package org.demo.example.domain
 
 import java.util.Date
 
-
 import akka.actor.{ ActorLogging, ActorRef, Props }
 import akka.persistence.journal.Tagged
 import akka.persistence.{ PersistentActor, SaveSnapshotSuccess, SnapshotOffer }
@@ -21,11 +20,10 @@ class WalletRepository(walletId: String) extends BaseRepository {
   private var transactionType = ""
   private var comment = ""
   private var active = true
-  private var fromWalletRef: Option[ActorRef] = None  // to notify on successful transfer deposit
+  private var fromWalletRef: Option[ActorRef] = None // to notify on successful transfer deposit
   private var serviceActorRef: Option[ActorRef] = None // to notify on transfer result
 
   override def persistenceId: String = walletId
-
 
   override def receiveCommandBehavior: Receive = {
 
@@ -114,7 +112,7 @@ class WalletRepository(walletId: String) extends BaseRepository {
       val wallet = Wallet(persistenceId, customerId, name, amt, new Date,
         TransactionType.DEPOSIT, s"Restore from failed transfer to $toWalletId")
       performPersist(wallet, serviceActorRef,
-                Some(WalletTransferResult(persistenceId, toWalletId, amt, WalletNotifications.TRANSFER_FAILED)))
+        Some(WalletTransferResult(persistenceId, toWalletId, amt, WalletNotifications.TRANSFER_FAILED)))
       serviceActorRef = None
 
     case SaveSnapshotSuccess(metadata) =>

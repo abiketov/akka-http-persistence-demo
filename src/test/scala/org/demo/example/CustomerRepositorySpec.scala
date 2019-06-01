@@ -10,7 +10,6 @@ import scala.reflect.io.Path
 class CustomerRepositorySpec extends TestKit(ActorSystem("CustomerSpec"))
   with ImplicitSender with WordSpecLike with BeforeAndAfterAll {
 
-
   override def afterAll(): Unit = {
 
     TestKit.shutdownActorSystem(system)
